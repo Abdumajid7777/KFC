@@ -22,6 +22,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-&j-2qux7)_cfvt_tp(p+gvc$jzd!s1lhwu92-0%d%0_+vdge$t'
 
+SECRET_KEY = 'django-insecure-_%6)o_0cawm57=aw4321e&opa_gdln@kk1m%qnq!me^t9lq2_^'
+
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -39,10 +42,14 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'main',
     'rest_framework',
+
     'rest_framework.authtoken',
     'drf_yasg',
     'django_filters',
     'smart_selects'
+
+    'django_filters',
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -56,6 +63,7 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'core.urls'
+
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -115,9 +123,14 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/6.1/topics/i18n/
 
+
 LANGUAGE_CODE = 'ru'
 
 TIME_ZONE = 'Asia/bishkek'
+
+LANGUAGE_CODE = 'ru-ru'
+
+TIME_ZONE = 'Asia/Bishkek'
 
 USE_I18N = True
 
@@ -130,6 +143,7 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 
+
 # Email
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
 MAILERS = {
@@ -138,4 +152,27 @@ MAILERS = {
     },
 }
 DEFAULT_FROM_EMAIL = 'kfc@support.com'
+
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+# Email
+# https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
+
+MAILERS = {
+    'default': {
+        'BACKEND': 'django.core.mail.backends.console.EmailBackend',
+    },
+}
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+    'DEFAULT_FILTER_BACKENDS': [
+        'django_filters.rest_framework.DjangoFilterBackend',
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'main.pagination.CustomPagination',
+    'PAGE_SIZE': 5,
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
 

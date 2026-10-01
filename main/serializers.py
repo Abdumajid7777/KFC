@@ -1,7 +1,15 @@
-
+from django.core.mail import send_mail
+from django.conf import settings
+from django.contrib.auth.models import User
 from rest_framework import serializers
-from .models import Review
-
+from .models import (
+    Review,     
+    Restaurant,
+    Category,
+    Food,
+    Order,
+    OrderItem
+)
 class ReviewSerializer(serializers.ModelSerializer):
     user_username = serializers.ReadOnlyField(source='user.username')
 
@@ -10,16 +18,7 @@ class ReviewSerializer(serializers.ModelSerializer):
         fields = ['id', 'user', 'user_username', 'food', 'text', 'rating', 'created_at']
         read_only_fields = ['id', 'user', 'created_at']
 
-from django.contrib.auth.models import User
-from rest_framework import serializers
 
-from .models import (
-    Restaurant,
-    Category,
-    Food,
-    Order,
-    OrderItem
-)
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -90,37 +89,22 @@ class OrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Order
-        fields = [
-            'id',
-            'status',
-            'total_price',
-            'created_at',
-            'items',
-        ]
-        read_only_fields = [
-            'status',
-            'total_price',
-            'created_at',
-        ]
+        fields = ['id', 'status', 'total_price', 'created_at', 'items']
+        read_only_fields = ['status', 'total_price', 'created_at']
 
     def create(self, validated_data):
         items_data = validated_data.pop('items')
+        user = self.context['request'].user
 
         if not items_data:
-            raise serializers.ValidationError(
-                {'items': 'Заказ должен содержать хотя бы один товар.'}
-            )
+            raise serializers.ValidationError({'items': 'Заказ должен содержать хотя бы один товар.'})
 
-        order = Order.objects.create(
-            user=self.context['request'].user
-        )
-
+        order = Order.objects.create(user=user)
         total_price = 0
 
         for item_data in items_data:
             food = item_data['food']
             quantity = item_data['quantity']
-
             price = food.price
 
             OrderItem.objects.create(
@@ -129,11 +113,18 @@ class OrderSerializer(serializers.ModelSerializer):
                 quantity=quantity,
                 price=price
             )
-
             total_price += price * quantity
 
         order.total_price = total_price
         order.save()
 
-        return order
+        if user.email:
+            send_mail(
+                subject=f'Заказ №{order.id} муваффақиятли яратилди',
+                message=f'Ҳурматли {user.username},\n\nСизнинг #{order.id} рақамли заказингиз қабул қилинди.\nУмумий сумма: {total_price} сўм.',
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[user.email],
+                fail_silently=True,
+            )
 
+        return order

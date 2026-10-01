@@ -21,29 +21,14 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Food)
 class FoodAdmin(admin.ModelAdmin):
-    list_display = (
-        'id',
-        'name',
-        'price',
-        'restaurant',
-        'category'
-    )
+    list_display = ('id','name','price','restaurant','category')
 
-    list_filter = (
-        'restaurant',
-        'category'
-    )
+    list_filter = ('restaurant','category')
 
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = (
-        'id',
-        'user',
-        'status',
-        'total_price',
-        'created_at'
-    )
+    list_display = ('id','user','status','total_price','created_at')
 
     list_filter = ('status',)
 

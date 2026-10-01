@@ -20,7 +20,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/6.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-&j-2qux7)_cfvt_tp(p+gvc$jzd!s1lhwu92-0%d%0_+vdge$t'
 
 SECRET_KEY = 'django-insecure-_%6)o_0cawm57=aw4321e&opa_gdln@kk1m%qnq!me^t9lq2_^'
 
@@ -42,13 +41,10 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'main',
     'rest_framework',
-
     'rest_framework.authtoken',
     'drf_yasg',
     'django_filters',
-    'smart_selects'
-
-    'django_filters',
+    'smart_selects',
     'drf_spectacular',
 ]
 
@@ -64,13 +60,6 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'core.urls'
 
-
-REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-    ),
-}
 
 TEMPLATES = [
     {
@@ -146,11 +135,7 @@ STATIC_URL = 'static/'
 
 # Email
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
-MAILERS = {
-    "default": {
-        "BACKEND": "django.core.mail.backends.console.EmailBackend",
-    },
-}
+
 DEFAULT_FROM_EMAIL = 'kfc@support.com'
 
 
@@ -159,14 +144,16 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # Email
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
 
-MAILERS = {
-    'default': {
-        'BACKEND': 'django.core.mail.backends.console.EmailBackend',
-    },
-}
+# Email
+
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+DEFAULT_FROM_EMAIL = 'kfc@support.com'
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
     ],
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend',
@@ -175,4 +162,3 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 5,
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
-

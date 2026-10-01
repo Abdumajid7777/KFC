@@ -1,43 +1,40 @@
 
 from django.core.mail import send_mail
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
-from .models import Review
-from .serializers import ReviewSerializer
 from .permissions import IsReviewOwnerOrReadOnly, IsRestaurantOwnerOrReadOnly
+from django.contrib.auth.models import User
+from rest_framework import generics, viewsets, filters
+from .models import Restaurant,Category,Food,Order,OrderItem, Review
+from .serializers import UserSerializer,RestaurantSerializer,CategorySerializer, ReviewSerializer, FoodSerializer,OrderSerializer,OrderItemSerializer
+from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly, AllowAny
+from rest_framework.exceptions import PermissionDenied
+
+class FoodViewSet(viewsets.ModelViewSet):
+    queryset = Food.objects.all()
+    serializer_class = FoodSerializer
+    permission_classes = [IsAuthenticatedOrReadOnly, IsRestaurantOwnerOrReadOnly]
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = {
+        'category': ['exact'],
+        'price': ['gte', 'lte'],
+    }
+
+    def perform_create(self, serializer):
+        # Ресторан эгаси фақат ўз ресторанига блюдо қўша олишини таъминлаш
+        restaurant = getattr(self.request.user, 'restaurant', None)
+        if not restaurant:
+            raise PermissionDenied("Сизда ресторан мавжуд эмас ёки сиз ресторан эгаси эмассиз.")
+        serializer.save(restaurant=restaurant)
 
 
-class ReviewViewSet(ModelViewSet):
+class ReviewViewSet(viewsets.ModelViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
     permission_classes = [IsAuthenticatedOrReadOnly, IsReviewOwnerOrReadOnly]
 
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
-
-from django.contrib.auth.models import User
-
-from rest_framework import generics
-from rest_framework.permissions import IsAuthenticated, AllowAny
-
-from .models import (
-    Restaurant,
-    Category,
-    Food,
-    Order,
-    OrderItem
-)
-
-from .serializers import (
-    UserSerializer,
-    RestaurantSerializer,
-    CategorySerializer,
-    FoodSerializer,
-    OrderSerializer,
-    OrderItemSerializer
-)
 
 
 class RegisterView(generics.CreateAPIView):

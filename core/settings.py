@@ -139,8 +139,14 @@ STATIC_URL = 'static/'
 DEFAULT_FROM_EMAIL = 'kfc@support.com'
 
 
+import os
+
+# Настройки статических файлов (CSS, JS, изображения)
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Email
 # https://docs.djangoproject.com/en/6.1/topics/email/#topic-email-configuration
 

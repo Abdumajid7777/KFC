@@ -2,6 +2,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib.auth.models import User
 from rest_framework import serializers
+from django.contrib.auth import authenticate
 from .models import (
     Review,     
     Restaurant,
@@ -10,6 +11,45 @@ from .models import (
     Order,
     OrderItem
 )
+
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length = 150)
+    password = serializers.CharField(write_only=True)
+
+    def validate(self,data):
+
+        user = authenticate(
+            username = data.get('username'),
+            password = data.get('password')
+        )
+
+        if user is None:
+            raise serializers.ValidationError(
+                'Invalid password or username'
+            )
+            
+        data['user'] = user
+
+        return data
+    
+class RegisterSerializer(serializers.Serializer):
+    username = serializers.CharField(max_length = 150)
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True)
+
+    def validate_username(self, value):
+        if User.objects.filter(username=value).exists():
+            raise serializers.ValidationError("Bu username allaqachon band.")
+        return value
+
+    def create(self,validate_data):
+        user = User.objects.create_user(
+            username = validate_data['username'],
+            email = validate_data['email'],
+            password = validate_data['password']
+        )
+        return user
+
 class ReviewSerializer(serializers.ModelSerializer):
     user_username = serializers.ReadOnlyField(source='user.username')
 
@@ -65,12 +105,8 @@ class FoodSerializer(serializers.ModelSerializer):
 class OrderItemSerializer(serializers.ModelSerializer):
     class Meta:
         model = OrderItem
-        fields = [
-            'id',
-            'food',
-            'quantity',
-            'price',
-        ]
+        fields = ['id', 'order', 'food', 'quantity', 'price']
+        read_only_fields = ['price']
         read_only_fields = ['price']
 
     def create(self, validated_data):

@@ -38,7 +38,7 @@ class Food(models.Model):
     description = models.TextField(verbose_name='Описание', blank=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, verbose_name='Цена')
     restaurant = models.ForeignKey(Restaurant,on_delete=models.CASCADE,related_name='foods',verbose_name='Ресторан')
-    category = models.ForeignKey(Category,on_delete=models.CASCADE,related_name='foods',verbose_name='Категория')
+    category = models.ForeignKey(Category,on_delete=models.CASCADE,related_name="foods",verbose_name='Категория')
 
     def __str__(self):
         return self.name
